@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1e3a5f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Koru Liste Mobil Dönüştürücü</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --navy: #1e3a5f;
+      --navy-dark: #132844;
+      --blue: #1d4ed8;
+      --amber: #b45309;
+      --amber-bg: #fef3c7;
+      --green: #047857;
+      --green-bg: #ecfdf5;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.45;
+      padding-bottom: 36px;
+    }
+    .topbar {
+      background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+      color: #fff;
+      padding: 16px 16px 14px;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.22);
+    }
+    .topbar-row {
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .app-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.28);
+    }
+    .app-title {
+      font-size: 19px;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -0.2px;
+    }
+    .app-sub {
+      font-size: 13px;
+      color: #cbd5e1;
+      margin: 2px 0 0;
+    }
+    .offline-pill {
+      margin-left: auto;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.22);
+      color: #a7f3d0;
+      border: 1px solid rgba(167, 243, 208, 0.35);
+      padding: 4px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      display: none;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+    .install-banner {
+      background: #eff6ff;
+      border: 2px solid #3b82f6;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .install-banner p {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 52px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16.5px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.08s ease, opacity 0.15s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-install {
+      background: #1d4ed8;
+      color: #fff;
+      min-height: 44px;
+      font-size: 14px;
+      padding: 8px 14px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .upload-card {
+      background: var(--surface);
+      border: 2.5px dashed #64748b;
+      border-radius: 18px;
+      padding: 24px 18px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+      margin-bottom: 14px;
+    }
+    .upload-card.dragover {
+      border-color: var(--blue);
+      background: #eff6ff;
+    }
+    .upload-emoji { font-size: 42px; line-height: 1; margin-bottom: 8px; }
+    .upload-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 0 6px;
+      color: var(--navy-dark);
+    }
+    .upload-desc {
+      font-size: 14.5px;
+      color: var(--muted);
+      margin: 0 0 18px;
+    }
+    .btn-pick {
+      width: 100%;
+      min-height: 60px;
+      font-size: 19px;
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.30);
+    }
+    #fileInput {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+    }
+    .privacy-note {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #065f46;
+      background: #ecfdf5;
+      padding: 8px 10px;
+      border-radius: 9px;
+      font-weight: 600;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+    }
+    .hidden { display: none !important; }
+
+    .progress-title {
+      font-size: 17.5px;
+      font-weight: 800;
+      color: var(--navy);
+      margin: 0 0 8px;
+    }
+    .progress-track {
+      width: 100%;
+      height: 16px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2563eb, #059669);
+      border-radius: 999px;
+      transition: width 0.2s ease;
+    }
+    .progress-msg {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .summary-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .summary-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--green);
+      margin: 0;
+    }
+    .date-badge {
+      font-size: 13px;
+      font-weight: 800;
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .stat-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 9px 11px;
+    }
+    .stat-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.1;
+    }
+    .stat-lbl {
+      font-size: 12.5px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .diff-box {
+      background: var(--amber-bg);
+      border: 1.5px solid #f59e0b;
+      border-radius: 11px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      color: #78350f;
+      font-weight: 600;
+    }
+    .diff-box ul {
+      margin: 4px 0 0 18px;
+      padding: 0;
+    }
+
+    .result-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+    }
+    .result-card.firms { border-left: 6px solid #d97706; }
+    .result-card.blok { border-left: 6px solid #1d4ed8; }
+    .rc-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 4px;
+      color: var(--text);
+    }
+    .rc-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 12px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .rc-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .rc-actions .btn {
+      padding: 10px 8px;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+    .btn-dl {
+      background: #047857;
+      color: #fff;
+      font-size: 16px;
+    }
+    .btn-share {
+      background: #e2e8f0;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      font-size: 15.5px;
+    }
+    .btn-reset {
+      width: 100%;
+      background: #fff;
+      color: var(--navy);
+      border: 2px solid var(--navy);
+      margin-top: 4px;
+    }
+    .error-box {
+      background: var(--danger-bg);
+      border: 2px solid #ef4444;
+      color: var(--danger);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    details.guide {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 15px;
+    }
+    details.guide summary {
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--navy);
+      cursor: pointer;
+      list-style: none;
+    }
+    details.guide ol {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      font-size: 14.5px;
+      color: #334155;
+    }
+    details.guide li { margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-row">
+      <img src="icons/icon-192.png" alt="Koru Liste" class="app-icon" />
+      <div>
+        <h1 class="app-title">Koru Liste Dönüştürücü</h1>
+        <p class="app-sub">Firmalar &amp; Blok 1–7 / 16 Mobil Rehber</p>
+      </div>
+      <span id="offlineBadge" class="offline-pill">Çevrimdışı Hazır ✓</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="installBanner" class="install-banner">
+      <p>📲 Telefonunuza uygulama olarak ekleyin; internet yokken bile çalışsın.</p>
+      <button id="installBtn" class="btn btn-install" type="button">Ana Ekrana Ekle</button>
+    </div>
+
+    <div id="errorBox" class="error-box hidden"></div>
+
+    <section id="uploadSection" class="upload-card">
+      <div class="upload-emoji">📄</div>
+      <h2 class="upload-title">Yeni PDF Listesini Seçin</h2>
+      <p class="upload-desc">
+        WhatsApp'tan inen <strong>Personel Giriş Çıkış Çizelgesi</strong> PDF'ini seçin; telefonunuzda anında 2 ayrı mobil rehber hazırlansın.
+      </p>
+      <input id="fileInput" type="file" accept="application/pdf,.pdf" />
+      <label for="fileInput" id="pickBtn" class="btn btn-pick" role="button" tabindex="0">
+        📂 Yeni PDF Seç
+      </label>
+      <div class="privacy-note">
+        🔒 Bilgiler internet veya başka bir sunucuya gönderilmez; işlem %100 telefonunuzda yapılır.
+      </div>
+    </section>
+
+    <section id="progressSection" class="panel hidden">
+      <p class="progress-title">⏳ Mobil PDF'ler Hazırlanıyor...</p>
+      <p id="fileNameLabel" style="margin:0 0 10px;font-size:13.5px;color:#475569;"></p>
+      <div class="progress-track">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div id="progressMsg" class="progress-msg">Başlatılıyor...</div>
+    </section>
+
+    <section id="resultSection" class="hidden">
+      <div class="panel">
+        <div class="summary-head">
+          <h2 class="summary-title">✅ İki Güncel PDF Hazır!</h2>
+          <span id="dateBadge" class="date-badge">Tarih: -</span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div id="statFirms" class="stat-num">-</div>
+            <div class="stat-lbl">Parsel 4 Çalışan / Firma</div>
+          </div>
+          <div class="stat-box">
+            <div id="statBlok" class="stat-num">-</div>
+            <div class="stat-lbl">Blok 1–7 &amp; 16 Daire / Bildirim</div>
+          </div>
+          <div class="stat-box">
+            <div id="statOturum" class="stat-num">-</div>
+            <div class="stat-lbl">Oturum Listesi Dairesi</div>
+          </div>
+          <div class="stat-box">
+            <div id="statPlates" class="stat-num">-</div>
+            <div class="stat-lbl">Hızlı Arama Plakası</div>
+          </div>
+        </div>
+
+        <div id="diffBox" class="diff-box hidden"></div>
+
+        <div class="result-card firms">
+          <h3 class="rc-title">🏢 1. Firmalar ve Çalışanlar PDF'i</h3>
+          <p id="firmsMeta" class="rc-meta">Parsel 4 Firmalar + A–Z Çalışan + Mesa &amp; Kiptaş</p>
+          <div class="rc-actions">
+            <button id="dlFirmsBtn" class="btn btn-dl" type="button">⬇️ İndir</button>
+            <button id="shareFirmsBtn" class="btn btn-share" type="button">📤 Aç / Paylaş</button>
+          </div>
+        </div>
+
+        <div class="result-card blok">
+          <h3 class="rc-title">🏠 2. Blok 1–7 &amp; 16 Mobil Rehber</h3>
+          <p id="blokMeta" class="rc-meta">Tıklanabilir Fihrist + Oturum + Bildirimler + Plaka Dizini</p>
+          <div class="rc-actions">
+            <button id="dlBlokBtn" class="btn btn-dl" type="button">⬇️ İndir</button>
+            <button id="shareBlokBtn" class="btn btn-share" type="button">📤 Aç / Paylaş</button>
+          </div>
+        </div>
+
+        <button id="resetBtn" class="btn btn-reset" type="button">🔄 Yeni PDF Dönüştür</button>
+      </div>
+    </section>
+
+    <details class="guide">
+      <summary>❓ Telefonda Nasıl Kullanılır? (3 Adım)</summary>
+      <ol>
+        <li>Yukarıdan <strong>Ana Ekrana Ekle</strong> butonuna (veya Chrome sağ üst menüden <em>Ana ekrana ekle</em>'ye) dokunun.</li>
+        <li>WhatsApp'ta yeni liste PDF'i geldiğinde doğrudan telefona indirip bu uygulamadan <strong>📂 Yeni PDF Seç</strong> diyebilir veya PDF'e basılı tutup <strong>Paylaş → Koru Liste</strong> seçebilirsiniz.</li>
+        <li><strong>⬇️ İndir</strong> dedikten sonra açılan PDF içinde arama kutusuna Türkçe harf kullanmadan isim (<code>ozpinar</code>, <code>yigitoglu</code>), plaka (<code>34NJR212</code>) veya daire (<code>6/3</code>) yazarak anında bulabilirsiniz.</li>
+      </ol>
+    </details>
+  </main>
+
+  <script src="vendor/pdf.min.js"></script>
+  <script src="vendor/pdf-lib.min.js"></script>
+  <script src="vendor/fontkit.umd.min.js"></script>
+  <script src="core/converter.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
