@@ -818,6 +818,8 @@
     const annotDict = outDoc.context.obj({
       Type: "Annot",
       Subtype: "Link",
+      P: page.ref,
+      H: "I",
       F: 4,
       Rect: [
         Number(rectTD.x0.toFixed(2)),
@@ -884,11 +886,18 @@
 
   function drawTextTD(page, text, x, yBaselineTD, size, font, colorTuple, PDFLib) {
     const { rgb } = PDFLib;
+    if (!page._koruFontKeys) page._koruFontKeys = new Map();
+    let fKey = page._koruFontKeys.get(font);
+    if (!fKey) {
+      fKey = page.node.newFontDictionary(font.name, font.ref);
+      page._koruFontKeys.set(font, fKey);
+    }
+    page.font = font;
+    page.fontKey = fKey;
     page.drawText(String(text), {
       x,
       y: PH - yBaselineTD,
       size,
-      font,
       color: rgb(colorTuple[0], colorTuple[1], colorTuple[2]),
     });
   }
@@ -1348,7 +1357,7 @@
     setPdfOutlines(out, toc, PDFLib);
 
     return {
-      bytes: await out.save(),
+      bytes: await out.save({ useObjectStreams: false }),
       pageMeta: extractPageInteractiveMeta(allPages),
     };
   }
@@ -1812,7 +1821,7 @@
     setPdfOutlines(out, toc, PDFLib);
 
     return {
-      bytes: await out.save(),
+      bytes: await out.save({ useObjectStreams: false }),
       pageMeta: extractPageInteractiveMeta(allPages),
     };
   }

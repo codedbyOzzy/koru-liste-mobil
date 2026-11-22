@@ -1,4 +1,4 @@
-const CACHE_NAME = "koru-liste-pwa-v3";
+const CACHE_NAME = "koru-liste-pwa-v4";
 const SHARED_CACHE = "koru-shared-pdf";
 const SHARED_KEY = "./__shared_pdf__";
 
