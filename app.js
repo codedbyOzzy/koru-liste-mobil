@@ -69,12 +69,21 @@
   let viewerTotalPages = 1;
   let viewerRenderTask = null;
 
-  // Service Worker registration
+  // Service Worker registration + auto-reload when a new version activates
   if ("serviceWorker" in navigator) {
+    let swRefreshing = false;
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (hadController && !swRefreshing) {
+        swRefreshing = true;
+        window.location.reload();
+      }
+    });
     window.addEventListener("load", () => {
       navigator.serviceWorker
         .register("./sw.js")
         .then((reg) => {
+          try { reg.update(); } catch (_) {}
           if (reg.active || navigator.serviceWorker.controller) {
             offlineBadge.style.display = "inline-block";
           }
