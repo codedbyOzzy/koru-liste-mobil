@@ -761,6 +761,7 @@
   function insertHiddenSearchLayer(page, helvFont, rectTD, textStr, PDFLib) {
     const asciiSafe = toPrintableAscii(textStr);
     if (!asciiSafe) return;
+    page._koruSearch = (page._koruSearch || "") + " " + asciiSafe.toLowerCase();
 
     const {
       pushGraphicsState, popGraphicsState, beginText, endText,
@@ -813,14 +814,53 @@
   }
 
   function addInternalLinkTD(outDoc, page, rectTD, targetPage, targetY_TD) {
+    const destY = Number(Math.max(0, PH - targetY_TD).toFixed(2));
     const annotDict = outDoc.context.obj({
       Type: "Annot",
       Subtype: "Link",
-      Rect: [rectTD.x0, PH - rectTD.y1, rectTD.x1, PH - rectTD.y0],
+      F: 4,
+      Rect: [
+        Number(rectTD.x0.toFixed(2)),
+        Number((PH - rectTD.y1).toFixed(2)),
+        Number(rectTD.x1.toFixed(2)),
+        Number((PH - rectTD.y0).toFixed(2)),
+      ],
       Border: [0, 0, 0],
-      Dest: [targetPage.ref, "XYZ", 0, Math.max(0, PH - targetY_TD), null],
+      BS: { W: 0 },
+      A: {
+        Type: "Action",
+        S: "GoTo",
+        D: [targetPage.ref, "XYZ", 0, destY, 0],
+      },
     });
     page.node.addAnnot(outDoc.context.register(annotDict));
+
+    if (!page._koruLinks) page._koruLinks = [];
+    page._koruLinks.push({
+      x0: Number(rectTD.x0.toFixed(1)),
+      y0: Number(rectTD.y0.toFixed(1)),
+      x1: Number(rectTD.x1.toFixed(1)),
+      y1: Number(rectTD.y1.toFixed(1)),
+      targetPageObj: targetPage,
+      targetY: Number(targetY_TD.toFixed(1)),
+    });
+  }
+
+  function extractPageInteractiveMeta(allPages) {
+    return allPages.map((p) => {
+      const links = (p._koruLinks || []).map((lnk) => ({
+        x0: lnk.x0,
+        y0: lnk.y0,
+        x1: lnk.x1,
+        y1: lnk.y1,
+        targetPage: allPages.indexOf(lnk.targetPageObj) + 1,
+        targetY: lnk.targetY,
+      }));
+      return {
+        links,
+        searchText: (p._koruSearch || "").replace(/\s+/g, " ").trim(),
+      };
+    });
   }
 
   function drawRectTD(page, rectTD, opts, PDFLib) {
@@ -1307,7 +1347,10 @@
     toc.push({ level: 1, title: "Mesa ASL & Kiptaş & Satış Ofisi (S.1-3)", page: p13StartPage, yTD: 0 });
     setPdfOutlines(out, toc, PDFLib);
 
-    return await out.save();
+    return {
+      bytes: await out.save(),
+      pageMeta: extractPageInteractiveMeta(allPages),
+    };
   }
 
   async function buildMobileBlokPdf(srcPdfBytes, srcNumPages, oturumFiltered, grouped, groupMeta, sortedPlates, sortedKeys, dateBadge, deps, onProgress) {
@@ -1768,7 +1811,10 @@
     toc.push({ level: 1, title: `Hızlı Plaka Arama Dizini (${sortedPlates.length} Plaka)`, page: plateDirStartPage, yTD: 0 });
     setPdfOutlines(out, toc, PDFLib);
 
-    return await out.save();
+    return {
+      bytes: await out.save(),
+      pageMeta: extractPageInteractiveMeta(allPages),
+    };
   }
 
   // ---------------- MAIN ENTRY POINT ----------------
@@ -1954,10 +2000,10 @@
     });
 
     progress(56, "Firmalar ve Çalışanlar PDF'i hazırlanıyor...");
-    const firmsPdfBytes = await buildFirmsPdf(firmsMap, p13Sections, dateBadge, deps);
+    const firmsOut = await buildFirmsPdf(firmsMap, p13Sections, dateBadge, deps);
 
     progress(68, "Blok 1–7 & 16 Mobil Rehber PDF'i hazırlanıyor...");
-    const blokPdfBytes = await buildMobileBlokPdf(
+    const blokOut = await buildMobileBlokPdf(
       srcCopyForLib, numPages, oturumFiltered, grouped, groupMeta, sortedPlates, sortedKeys, dateBadge, deps, progress
     );
 
@@ -1992,8 +2038,10 @@
 
     progress(100, "Hazır!");
     return {
-      firmsPdfBytes,
-      blokPdfBytes,
+      firmsPdfBytes: firmsOut.bytes,
+      blokPdfBytes: blokOut.bytes,
+      firmsPageMeta: firmsOut.pageMeta,
+      blokPageMeta: blokOut.pageMeta,
       firmsFilename: `Parsel4_Firmalar_ve_Calisanlar_Mobil_${fileTag}.pdf`,
       blokFilename: `Blok_1-7_ve_16_Mobil_Rehber_${fileTag}.pdf`,
       stats,

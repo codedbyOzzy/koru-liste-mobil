@@ -1,4 +1,4 @@
-const CACHE_NAME = "koru-liste-pwa-v2";
+const CACHE_NAME = "koru-liste-pwa-v3";
 const SHARED_CACHE = "koru-shared-pdf";
 const SHARED_KEY = "./__shared_pdf__";
 
@@ -71,21 +71,39 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  const isHeavyStatic = /\/(vendor|fonts|icons)\//.test(url.pathname);
+  if (isHeavyStatic) {
+    event.respondWith(
+      caches.match(req, { ignoreSearch: true }).then((cached) => {
+        if (cached) return cached;
+        return fetch(req).then((networkResp) => {
+          if (networkResp && networkResp.ok) {
+            const clone = networkResp.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(req, clone));
+          }
+          return networkResp;
+        });
+      })
+    );
+    return;
+  }
+
+  // Network-first with offline cache fallback for HTML & app scripts
   event.respondWith(
-    caches.match(req, { ignoreSearch: true }).then((cached) => {
-      if (cached) return cached;
-      return fetch(req).then((networkResp) => {
-        if (networkResp && networkResp.ok && networkResp.type === "basic") {
+    fetch(req)
+      .then((networkResp) => {
+        if (networkResp && networkResp.ok) {
           const clone = networkResp.clone();
           caches.open(CACHE_NAME).then((c) => c.put(req, clone));
         }
         return networkResp;
-      });
-    }).catch(() => {
-      if (req.mode === "navigate") {
-        return caches.match("./index.html");
-      }
-      return undefined;
-    })
+      })
+      .catch(() =>
+        caches.match(req, { ignoreSearch: true }).then((cached) => {
+          if (cached) return cached;
+          if (req.mode === "navigate") return caches.match("./index.html");
+          return undefined;
+        })
+      )
   );
 });

@@ -106,11 +106,11 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      min-height: 52px;
-      padding: 12px 18px;
+      min-height: 50px;
+      padding: 11px 16px;
       border-radius: 12px;
       border: none;
-      font-size: 16.5px;
+      font-size: 16px;
       font-weight: 700;
       cursor: pointer;
       text-decoration: none;
@@ -179,7 +179,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 18px;
+      padding: 16px;
       margin-bottom: 14px;
       box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
     }
@@ -247,10 +247,10 @@
       padding: 9px 11px;
     }
     .stat-num {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 800;
       color: var(--navy);
-      line-height: 1.1;
+      line-height: 1.15;
     }
     .stat-lbl {
       font-size: 12.5px;
@@ -276,45 +276,57 @@
       background: #fff;
       border: 1.5px solid var(--border);
       border-radius: 15px;
-      padding: 15px;
+      padding: 14px;
       margin-bottom: 12px;
       box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
     }
     .result-card.firms { border-left: 6px solid #d97706; }
     .result-card.blok { border-left: 6px solid #1d4ed8; }
     .rc-title {
-      font-size: 18px;
+      font-size: 17.5px;
       font-weight: 800;
       margin: 0 0 4px;
       color: var(--text);
     }
     .rc-meta {
-      font-size: 13px;
+      font-size: 12.8px;
       color: var(--muted);
-      margin: 0 0 12px;
+      margin: 0 0 11px;
       overflow-wrap: anywhere;
       word-break: break-word;
+    }
+    .btn-open-viewer {
+      width: 100%;
+      min-height: 54px;
+      margin-bottom: 8px;
+      font-size: 16.5px;
+      color: #fff;
+      background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+      box-shadow: 0 3px 10px rgba(29, 78, 216, 0.25);
+    }
+    .result-card.firms .btn-open-viewer {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      box-shadow: 0 3px 10px rgba(217, 119, 6, 0.25);
     }
     .rc-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
     .rc-actions .btn {
-      padding: 10px 8px;
-      font-size: 15px;
+      min-height: 44px;
+      padding: 8px 8px;
+      font-size: 14.5px;
       white-space: nowrap;
     }
     .btn-dl {
       background: #047857;
       color: #fff;
-      font-size: 16px;
     }
     .btn-share {
       background: #e2e8f0;
       color: #0f172a;
       border: 1px solid #cbd5e1;
-      font-size: 15.5px;
     }
     .btn-reset {
       width: 100%;
@@ -322,6 +334,16 @@
       color: var(--navy);
       border: 2px solid var(--navy);
       margin-top: 4px;
+    }
+    .android-tip {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e3a8a;
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
     }
     .error-box {
       background: var(--danger-bg);
@@ -353,6 +375,183 @@
       color: #334155;
     }
     details.guide li { margin-bottom: 6px; }
+
+    /* ---------------- BUILT-IN INTERACTIVE TOUCH PDF VIEWER ---------------- */
+    .viewer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #0f172a;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .viewer-header {
+      background: #1e293b;
+      color: #fff;
+      padding: 8px 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      flex-shrink: 0;
+    }
+    .viewer-nav-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+    .v-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 6px 10px;
+      border-radius: 9px;
+      border: 1px solid #475569;
+      background: #334155;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .v-btn:active { transform: scale(0.96); }
+    .v-btn-home {
+      background: #d97706;
+      border-color: #f59e0b;
+      color: #fff;
+    }
+    .v-btn-close {
+      margin-left: auto;
+      background: #dc2626;
+      border-color: #ef4444;
+    }
+    .v-page-select {
+      height: 40px;
+      border-radius: 9px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 0 8px;
+      max-width: 125px;
+    }
+    .viewer-search-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    #viewerSearchInput {
+      width: 100%;
+      height: 40px;
+      border-radius: 9px;
+      border: 1.5px solid #475569;
+      background: #fff;
+      color: #0f172a;
+      font-size: 15px;
+      padding: 0 38px 0 11px;
+      outline: none;
+    }
+    #viewerSearchInput:focus { border-color: #38bdf8; }
+    #viewerSearchClear {
+      position: absolute;
+      right: 5px;
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      border: none;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+    }
+    .viewer-hits-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 7px 2px 2px;
+      scrollbar-width: none;
+    }
+    .viewer-hits-bar::-webkit-scrollbar { display: none; }
+    .hit-chip {
+      flex: 0 0 auto;
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid #34d399;
+      background: #064e3b;
+      color: #ecfdf5;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .hit-chip.active {
+      background: #10b981;
+      color: #022c22;
+      border-color: #a7f3d0;
+    }
+    .viewer-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: auto;
+      padding: 10px 6px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      -webkit-overflow-scrolling: touch;
+    }
+    .page-stage {
+      position: relative;
+      width: 100%;
+      max-width: 595px;
+      background: #fff;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    #viewerCanvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    #viewerHotspots {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .pdf-hotspot {
+      position: absolute;
+      pointer-events: auto;
+      background: rgba(37, 99, 235, 0.0);
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      padding: 0;
+      margin: 0;
+      transition: background 0.12s ease;
+    }
+    .pdf-hotspot:active, .pdf-hotspot:hover {
+      background: rgba(245, 158, 11, 0.28);
+      outline: 1.5px solid rgba(217, 119, 6, 0.8);
+    }
+    .jump-flash {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 36px;
+      background: rgba(250, 204, 21, 0.42);
+      border-top: 2px solid #d97706;
+      border-bottom: 2px solid #d97706;
+      pointer-events: none;
+      animation: fadeFlash 1.4s ease forwards;
+    }
+    @keyframes fadeFlash {
+      0% { opacity: 1; }
+      70% { opacity: 0.85; }
+      100% { opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -379,7 +578,7 @@
       <div class="upload-emoji">📄</div>
       <h2 class="upload-title">Yeni PDF Listesini Seçin</h2>
       <p class="upload-desc">
-        WhatsApp'tan inen <strong>Personel Giriş Çıkış Çizelgesi</strong> PDF'ini seçin; telefonunuzda anında 2 ayrı mobil rehber hazırlansın.
+        WhatsApp'tan inen <strong>Personel Giriş Çıkış Çizelgesi</strong> PDF'ini seçin; telefonunuzda anında 2 ayrı tıklanabilir mobil rehber hazırlansın.
       </p>
       <input id="fileInput" type="file" accept="application/pdf,.pdf" />
       <label for="fileInput" id="pickBtn" class="btn btn-pick" role="button" tabindex="0">
@@ -402,7 +601,7 @@
     <section id="resultSection" class="hidden">
       <div class="panel">
         <div class="summary-head">
-          <h2 class="summary-title">✅ İki Güncel PDF Hazır!</h2>
+          <h2 class="summary-title">✅ İki Güncel Rehber Hazır!</h2>
           <span id="dateBadge" class="date-badge">Tarih: -</span>
         </div>
 
@@ -427,25 +626,35 @@
 
         <div id="diffBox" class="diff-box hidden"></div>
 
+        <div class="android-tip">
+          💡 <strong>Daire ve firmalara dokunarak sayfaya atlamak için</strong> aşağıdaki büyük <strong>"👁️ Rehberi Aç (Tıklanabilir)"</strong> butonlarını kullanın. <em>(Son yüklediğiniz liste telefonda kayıtlı kalır.)</em>
+        </div>
+
         <div class="result-card firms">
-          <h3 class="rc-title">🏢 1. Firmalar ve Çalışanlar PDF'i</h3>
+          <h3 class="rc-title">🏢 1. Firmalar ve Çalışanlar Rehberi</h3>
           <p id="firmsMeta" class="rc-meta">Parsel 4 Firmalar + A–Z Çalışan + Mesa &amp; Kiptaş</p>
+          <button id="openFirmsViewerBtn" class="btn btn-open-viewer" type="button">
+            👁️ Rehberi Aç (Dokunmatik &amp; Tıklanabilir)
+          </button>
           <div class="rc-actions">
-            <button id="dlFirmsBtn" class="btn btn-dl" type="button">⬇️ İndir</button>
-            <button id="shareFirmsBtn" class="btn btn-share" type="button">📤 Aç / Paylaş</button>
+            <button id="dlFirmsBtn" class="btn btn-dl" type="button">⬇️ PDF İndir</button>
+            <button id="shareFirmsBtn" class="btn btn-share" type="button">📤 Paylaş</button>
           </div>
         </div>
 
         <div class="result-card blok">
           <h3 class="rc-title">🏠 2. Blok 1–7 &amp; 16 Mobil Rehber</h3>
           <p id="blokMeta" class="rc-meta">Tıklanabilir Fihrist + Oturum + Bildirimler + Plaka Dizini</p>
+          <button id="openBlokViewerBtn" class="btn btn-open-viewer" type="button">
+            👁️ Rehberi Aç (Dokunmatik &amp; Tıklanabilir)
+          </button>
           <div class="rc-actions">
-            <button id="dlBlokBtn" class="btn btn-dl" type="button">⬇️ İndir</button>
-            <button id="shareBlokBtn" class="btn btn-share" type="button">📤 Aç / Paylaş</button>
+            <button id="dlBlokBtn" class="btn btn-dl" type="button">⬇️ PDF İndir</button>
+            <button id="shareBlokBtn" class="btn btn-share" type="button">📤 Paylaş</button>
           </div>
         </div>
 
-        <button id="resetBtn" class="btn btn-reset" type="button">🔄 Yeni PDF Dönüştür</button>
+        <button id="resetBtn" class="btn btn-reset" type="button">🔄 Yeni PDF Yükle / Değiştir</button>
       </div>
     </section>
 
@@ -453,11 +662,41 @@
       <summary>❓ Telefonda Nasıl Kullanılır? (3 Adım)</summary>
       <ol>
         <li>Yukarıdan <strong>Ana Ekrana Ekle</strong> butonuna (veya Chrome sağ üst menüden <em>Ana ekrana ekle</em>'ye) dokunun.</li>
-        <li>WhatsApp'ta yeni liste PDF'i geldiğinde doğrudan telefona indirip bu uygulamadan <strong>📂 Yeni PDF Seç</strong> diyebilir veya PDF'e basılı tutup <strong>Paylaş → Koru Liste</strong> seçebilirsiniz.</li>
-        <li><strong>⬇️ İndir</strong> dedikten sonra açılan PDF içinde arama kutusuna Türkçe harf kullanmadan isim (<code>ozpinar</code>, <code>yigitoglu</code>), plaka (<code>34NJR212</code>) veya daire (<code>6/3</code>) yazarak anında bulabilirsiniz.</li>
+        <li>WhatsApp'ta yeni liste PDF'i geldiğinde bu uygulamadan <strong>📂 Yeni PDF Seç</strong> diyebilir veya PDF'e basılı tutup <strong>Paylaş → Koru Liste</strong> seçebilirsiniz.</li>
+        <li><strong>👁️ Rehberi Aç (Dokunmatik &amp; Tıklanabilir)</strong> butonuna bastığınızda 1. sayfadaki tüm daire/firma kutularına dokunarak doğrudan ilgili sayfaya atlayabilir ve üstteki arama kutusundan Türkçe harf kullanmadan (<code>ozpinar</code>, <code>34njr212</code>, <code>6/3</code>) arama yapabilirsiniz.</li>
       </ol>
     </details>
   </main>
+
+  <!-- Built-in Interactive Touch PDF Viewer Modal -->
+  <div id="viewerModal" class="viewer-overlay hidden" role="dialog" aria-modal="true">
+    <div class="viewer-header">
+      <div class="viewer-nav-row">
+        <button id="viewerHomeBtn" class="v-btn v-btn-home" type="button">🏠 S.1 Fihrist</button>
+        <button id="viewerPrevBtn" class="v-btn" type="button" aria-label="Önceki Sayfa">◀</button>
+        <select id="viewerPageSelect" class="v-page-select" aria-label="Sayfa Seç"></select>
+        <button id="viewerNextBtn" class="v-btn" type="button" aria-label="Sonraki Sayfa">▶</button>
+        <button id="viewerCloseBtn" class="v-btn v-btn-close" type="button">✖ Kapat</button>
+      </div>
+      <div class="viewer-search-row">
+        <input
+          id="viewerSearchInput"
+          type="search"
+          autocomplete="off"
+          placeholder="🔍 İsim (ozpinar), plaka (34k6182), daire (6/3) veya firma ara..."
+        />
+        <button id="viewerSearchClear" type="button">✕</button>
+      </div>
+      <div id="viewerHitsBar" class="viewer-hits-bar hidden"></div>
+    </div>
+
+    <div id="viewerBody" class="viewer-body">
+      <div id="pageStage" class="page-stage">
+        <canvas id="viewerCanvas"></canvas>
+        <div id="viewerHotspots"></div>
+      </div>
+    </div>
+  </div>
 
   <script src="vendor/pdf.min.js"></script>
   <script src="vendor/pdf-lib.min.js"></script>
